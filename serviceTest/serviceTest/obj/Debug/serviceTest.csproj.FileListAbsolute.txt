@@ -1,0 +1,6 @@
+G:\serviceTest\serviceTest\bin\Debug\serviceTest.exe.config
+G:\serviceTest\serviceTest\bin\Debug\serviceTest.exe
+G:\serviceTest\serviceTest\bin\Debug\serviceTest.pdb
+G:\serviceTest\serviceTest\obj\Debug\serviceTest.csprojResolveAssemblyReference.cache
+G:\serviceTest\serviceTest\obj\Debug\serviceTest.exe
+G:\serviceTest\serviceTest\obj\Debug\serviceTest.pdb
