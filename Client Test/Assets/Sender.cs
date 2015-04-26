@@ -11,6 +11,8 @@ public class Sender : MonoBehaviour {
 
     public static Sender SenderIns;
 
+    public float fontScale;
+
     /// <summary>
     /// 用户输入的内容
     /// </summary>
@@ -33,18 +35,23 @@ public class Sender : MonoBehaviour {
 
     void OnGUI()
     {
-        GUI.skin.textField.fontSize = 15;
-        GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
-        
-        textEnter = GUI.TextField(new Rect(Screen.width * 0.1f, Screen.height - Screen.height * 0.05f - 30, Screen.width * 0.6f, 30), textEnter);
-        if (GUI.Button(new Rect(Screen.width * 0.75f, Screen.height - Screen.height * 0.05f - 30, Screen.width * 0.1f, 30), "Send") && textEnter!="")
+        if (!Receiver.connectServer)
         {
-            string sendStr = textEnter;
-            byte[] bSentAsBytes = Encoding.UTF8.GetBytes(sendStr);   //把字符串编码为字节
+            GUI.skin.textField.fontSize = (int)(Screen.width * fontScale);
+            GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
 
-            Receiver.clientSocketIns.Send(bSentAsBytes, bSentAsBytes.Length, 0); //发送信息
+            GUI.skin.button.fontSize = GUI.skin.textField.fontSize;
 
-            textEnter = "";
+            textEnter = GUI.TextField(new Rect(Screen.width * 0.1f, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2, Screen.width * 0.6f, GUI.skin.textField.fontSize * 2), textEnter);
+            if (GUI.Button(new Rect(Screen.width * 0.75f, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2, GUI.skin.textField.fontSize * 4, GUI.skin.textField.fontSize * 2), "Send") && textEnter != "")
+            {
+                string sendStr = textEnter;
+                byte[] bSentAsBytes = Encoding.UTF8.GetBytes(sendStr);   //把字符串编码为字节
+
+                Receiver.clientSocketIns.Send(bSentAsBytes, bSentAsBytes.Length, 0); //发送信息
+
+                textEnter = "";
+            }
         }
     }
     

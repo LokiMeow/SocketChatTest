@@ -14,15 +14,26 @@ public class Receiver : MonoBehaviour {
     /// </summary>
     string messages;
 
-    int port = 2333;
-    string host = "127.0.0.1";
+    int port = 3333;
+    string host = "192.168.88.103";
     IPAddress ipAddress ;
     IPEndPoint ipEndPoint;
+    string userName=string.Empty;
     public static Socket clientSocketIns;
     byte[] recvBytes = new byte[1024];
+
+    public float fontScale;
+
+    public static bool connectServer;
 	// Use this for initialization
 	void Start () {
-
+        connectServer = true;
+        port = PlayerPrefs.GetInt("port");
+        host = PlayerPrefs.GetString("host");
+        messages = "";
+	}
+    void ConnectServer()
+    {
         try
         {
 
@@ -36,14 +47,18 @@ public class Receiver : MonoBehaviour {
             clientSocketIns.Connect(ipEndPoint); //连接到服务器
 
             //向服务器发送信息
-            //string sendStr = "Hello,this is a socket test";
-            messages += "";
+            byte[] bSentAsBytes = Encoding.UTF8.GetBytes(userName);   //把字符串编码为字节
+
+            clientSocketIns.Send(bSentAsBytes, bSentAsBytes.Length, 0); //发送信息
 
             //接受从服务器返回的信息
             string recvStr = "";
-           
+
             int bytes;
             bytes = clientSocketIns.Receive(recvBytes, recvBytes.Length, 0);    //从服务器端接受返回信息
+
+            connectServer = false;
+
             recvStr += Encoding.UTF8.GetString(recvBytes, 0, bytes);
             if (recvStr != null || recvStr != string.Empty)
                 messages += string.Format("{0}\n", recvStr);    //回显服务器的返回信息
@@ -58,7 +73,7 @@ public class Receiver : MonoBehaviour {
         {
             messages += "SocketException:" + e + "\n";
         }
-	}
+    }
 
     public class StateObject
     {
@@ -90,17 +105,6 @@ public class Receiver : MonoBehaviour {
                 socket.BeginReceive(recvBytes, 0, StateObject.BUFFER_SIZE, 0,
                                          new AsyncCallback(ReceiveAsync), socket);
             }
-            else
-            {
-                //if (socketObj.sb.Length > 1)
-                //{
-                //    ////All of the data has been read, so displays it to the console
-                //    //string strContent;
-                //    //strContent = socketObj.sb.ToString();
-                //    //messages += strContent;
-                //}
-                //socket.Close();
-            }
         }
         catch (Exception e)
         {
@@ -113,14 +117,50 @@ public class Receiver : MonoBehaviour {
        
 	}
 
+    public Vector2 scrollPosition = Vector2.zero;
+
     void OnGUI()
     {
-        GUI.skin.label.fontSize = 13;
-        GUI.Box(new Rect(5, 5, Screen.width - 10, Screen.height - Screen.height * 0.075f - 30), "");
+        GUI.skin.label.fontSize = (int)(Screen.width*fontScale);
+        GUI.Box(new Rect(Screen.width * 0.025f, Screen.width * 0.025f, Screen.width - Screen.width * 0.025f * 2, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2 - Screen.width * 0.025f*2), "");
+        scrollPosition = GUI.BeginScrollView(new Rect(Screen.width * 0.025f, Screen.width * 0.025f, Screen.width - Screen.width * 0.025f * 2, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2 - Screen.width * 0.025f * 2), scrollPosition, new Rect(Screen.width * 0.05f, Screen.width * 0.05f, Screen.width - Screen.width * 0.05f * 2, Screen.height - Screen.width * 0.05f * 2), false, true);
         GUI.contentColor = Color.black;
-        GUI.Label(new Rect(10.5f, 10.5f, Screen.width - 20, Screen.height - 20), messages);
+        GUI.Label(new Rect(Screen.width * 0.05f + 0.05f, Screen.width * 0.05f + 0.05f, Screen.width - Screen.width * 0.05f * 2, Screen.height - Screen.width * 0.05f * 2), messages);
         GUI.contentColor = Color.white;
-        GUI.Label(new Rect(10, 10, Screen.width - 20, Screen.height - 20), messages);
+        GUI.Label(new Rect(Screen.width * 0.05f, Screen.width * 0.05f, Screen.width - Screen.width * 0.05f * 2, Screen.height - Screen.width * 0.05f * 2), messages);
+        GUI.EndScrollView();
+        if (connectServer)
+        {
+            GUI.skin.textField.fontSize = (int)(Screen.width * fontScale);
+            GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
+            GUI.skin.button.fontSize = GUI.skin.textField.fontSize;
+            GUI.BeginGroup(new Rect(Screen.width * 0.15f, (Screen.height - Screen.width * 0.6f) * 0.5f, Screen.width * 0.7f, Screen.width * 0.6f));
+            GUI.Box(new Rect(0, 0, Screen.width * 0.7f, GUI.skin.textField.fontSize*8), "");
+            GUILayout.BeginArea(new Rect(5, 5, Screen.width * 0.7f, GUI.skin.textField.fontSize*8));
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width * 0.65f));
+            GUILayout.Label("服务器IP:");
+            host = GUILayout.TextField(host, GUILayout.Width(Screen.width * 0.4f));
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width * 0.65f));
+            GUILayout.Label("端口:    ");
+            var portText = GUILayout.TextField(port.ToString(), GUILayout.Width(Screen.width * 0.4f));
+            int.TryParse(portText, out port);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal(GUILayout.Width(Screen.width * 0.65f));
+            GUILayout.Label("用户名称:");
+            userName = GUILayout.TextField(userName, GUILayout.Width(Screen.width * 0.4f));
+            GUILayout.EndHorizontal();
+            if (GUILayout.Button("登录", GUILayout.Width(Screen.width * 0.65f)))
+            {
+                ConnectServer();
+                PlayerPrefs.SetInt("port", port);
+                PlayerPrefs.SetString("host", host);
+            }
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
+            GUI.EndGroup();
+        }
     }
 
   

@@ -1,3 +1,3 @@
 5.0.1f1:1.9.8.0
-D:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll
-D:\Unity\Editor\Data\PlaybackEngines\iossupport\UnityEditor.iOS.Extensions.Xcode.dll
+D:/software/U3D/5.0.1/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll
+D:\software\U3D\5.0.1\Editor\Data\PlaybackEngines\iossupport\UnityEditor.iOS.Extensions.Xcode.dll

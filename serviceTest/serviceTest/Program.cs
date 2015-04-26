@@ -155,7 +155,10 @@ namespace SockeConsoleServer
                 else
                 {
                     if(Program.ClientList.Keys.Any(user=>user==socket))
+                    {
+                        Console.WriteLine("客户端正常断开连接。客户端：{0}", socket.RemoteEndPoint.ToString());
                         strContent = string.Format("用户【{0}】已登出系统。", Program.ClientList[socket]);
+                    }
                     socket.Close();
                 }
                 if(strContent!=null)
@@ -209,7 +212,7 @@ namespace SockeConsoleServer
         public static Dictionary<Socket, string> ClientList = new Dictionary<Socket, string>();
         static void Main(string[] args)
         {
-            AppTCPServer server = new AppTCPServer("127.0.0.1", 2333);
+            AppTCPServer server = new AppTCPServer("192.168.88.103", 3333);
             server.OnConnected += server_OnConnected;
             
             Console.WriteLine("按任意键结束程序……");
@@ -224,7 +227,7 @@ namespace SockeConsoleServer
         static void server_OnConnected(object sender, ClientConnectedEventArgs e)
         {
             Socket client = e.ClientSocket;
-            string hello = "你已连接上服务器，请输入用户名：\n";
+            string hello = "成功连接上服务器！\n";
             client.Send(Encoding.UTF8.GetBytes(hello));
         }
     }
