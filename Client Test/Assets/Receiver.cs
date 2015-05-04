@@ -7,7 +7,8 @@ using System.Text;
 using System;
 using System.Linq;
 
-public class Receiver : MonoBehaviour {
+public class Receiver : MonoBehaviour
+{
 
     /// <summary>
     /// 显示内容
@@ -16,22 +17,23 @@ public class Receiver : MonoBehaviour {
 
     int port = 3333;
     string host = "192.168.88.103";
-    IPAddress ipAddress ;
+    IPAddress ipAddress;
     IPEndPoint ipEndPoint;
-    string userName=string.Empty;
+    string userName = string.Empty;
     public static Socket clientSocketIns;
     byte[] recvBytes = new byte[1024];
 
     public float fontScale;
 
     public static bool connectServer;
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         connectServer = true;
         port = PlayerPrefs.GetInt("port");
         host = PlayerPrefs.GetString("host");
         messages = "";
-	}
+    }
     void ConnectServer()
     {
         try
@@ -101,7 +103,7 @@ public class Receiver : MonoBehaviour {
                 socketObj.sb.Append(Encoding.UTF8.GetString(socketObj.buffer, 0, read));
                 string strContent;
                 strContent = socketObj.sb.ToString();
-                messages += strContent+"\n";
+                messages += strContent + "\n";
                 socket.BeginReceive(recvBytes, 0, StateObject.BUFFER_SIZE, 0,
                                          new AsyncCallback(ReceiveAsync), socket);
             }
@@ -111,32 +113,42 @@ public class Receiver : MonoBehaviour {
             Console.WriteLine("AcceptAsync发生异常，异常信息:\n{0}", e.Message);
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-       
-	}
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 
     public Vector2 scrollPosition = Vector2.zero;
 
     void OnGUI()
     {
-        GUI.skin.label.fontSize = (int)(Screen.width*fontScale);
-        GUI.Box(new Rect(Screen.width * 0.025f, Screen.width * 0.025f, Screen.width - Screen.width * 0.025f * 2, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2 - Screen.width * 0.025f*2), "");
-        scrollPosition = GUI.BeginScrollView(new Rect(Screen.width * 0.025f, Screen.width * 0.025f, Screen.width - Screen.width * 0.025f * 2, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2 - Screen.width * 0.025f * 2), scrollPosition, new Rect(Screen.width * 0.05f, Screen.width * 0.05f, Screen.width - Screen.width * 0.05f * 2, Screen.height - Screen.width * 0.05f * 2), false, true);
+        GUI.skin.label.fontSize = (int)(Screen.width * fontScale);
+        GUI.Box(new Rect(Screen.width * 0.025f, Screen.width * 0.025f, Screen.width - Screen.width * 0.025f * 2, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2 - Screen.width * 0.025f * 2), "");
+
+        GUILayout.BeginArea(new Rect(Screen.width * 0.033f, Screen.width * 0.033f, Screen.width * 2, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2 - Screen.width * 0.03f * 2));
+        GUILayout.BeginScrollView(scrollPosition);
         GUI.contentColor = Color.black;
-        GUI.Label(new Rect(Screen.width * 0.05f + 0.05f, Screen.width * 0.05f + 0.05f, Screen.width - Screen.width * 0.05f * 2, Screen.height - Screen.width * 0.05f * 2), messages);
+        GUILayout.Label(messages, GUILayout.Width(Screen.width - Screen.width * 0.06f * 2));
+        GUILayout.EndScrollView();
+        GUILayout.EndArea();
+
+        GUILayout.BeginArea(new Rect(Screen.width * 0.03f, Screen.width * 0.03f, Screen.width - Screen.width * 0.03f * 2, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2 - Screen.width * 0.03f * 2));
+        scrollPosition = GUILayout.BeginScrollView(scrollPosition);
         GUI.contentColor = Color.white;
-        GUI.Label(new Rect(Screen.width * 0.05f, Screen.width * 0.05f, Screen.width - Screen.width * 0.05f * 2, Screen.height - Screen.width * 0.05f * 2), messages);
-        GUI.EndScrollView();
+        GUILayout.Label(messages, GUILayout.Width(Screen.width - Screen.width * 0.06f * 2));
+        GUILayout.EndScrollView();
+        GUILayout.EndArea();
+
         if (connectServer)
         {
             GUI.skin.textField.fontSize = (int)(Screen.width * fontScale);
             GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
             GUI.skin.button.fontSize = GUI.skin.textField.fontSize;
             GUI.BeginGroup(new Rect(Screen.width * 0.15f, (Screen.height - Screen.width * 0.6f) * 0.5f, Screen.width * 0.7f, Screen.width * 0.6f));
-            GUI.Box(new Rect(0, 0, Screen.width * 0.7f, GUI.skin.textField.fontSize*8), "");
-            GUILayout.BeginArea(new Rect(5, 5, Screen.width * 0.7f, GUI.skin.textField.fontSize*8));
+            GUI.Box(new Rect(0, 0, Screen.width * 0.7f, GUI.skin.textField.fontSize * 8), "");
+            GUILayout.BeginArea(new Rect(5, 5, Screen.width * 0.7f, GUI.skin.textField.fontSize * 8));
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal(GUILayout.Width(Screen.width * 0.65f));
             GUILayout.Label("服务器IP:");
@@ -163,5 +175,14 @@ public class Receiver : MonoBehaviour {
         }
     }
 
-  
+    public void ShowLastMessage()
+    {
+        scrollPosition.y = int.MaxValue;
+    }
+
+    public void OnAccidentlyDisconnect()
+    {
+        messages += "\n已与服务器断开连接！\n";
+        connectServer = true;
+    }
 }

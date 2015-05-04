@@ -45,12 +45,22 @@ public class Sender : MonoBehaviour {
             textEnter = GUI.TextField(new Rect(Screen.width * 0.1f, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2, Screen.width * 0.6f, GUI.skin.textField.fontSize * 2), textEnter);
             if (GUI.Button(new Rect(Screen.width * 0.75f, Screen.height - Screen.height * 0.05f - GUI.skin.textField.fontSize * 2, GUI.skin.textField.fontSize * 4, GUI.skin.textField.fontSize * 2), "Send") && textEnter != "")
             {
-                string sendStr = textEnter;
-                byte[] bSentAsBytes = Encoding.UTF8.GetBytes(sendStr);   //把字符串编码为字节
+                if(Receiver.clientSocketIns==null||!Receiver.clientSocketIns.Connected)
+                {
+                    GameObject.Find("Receiver").SendMessage("OnAccidentlyDisconnect");
+                }
+                else
+                {
+                    string sendStr = textEnter;
+                    byte[] bSentAsBytes = Encoding.UTF8.GetBytes(sendStr);   //把字符串编码为字节
 
-                Receiver.clientSocketIns.Send(bSentAsBytes, bSentAsBytes.Length, 0); //发送信息
+                    Receiver.clientSocketIns.Send(bSentAsBytes, bSentAsBytes.Length, 0); //发送信息
 
-                textEnter = "";
+                    textEnter = "";
+
+                    GameObject.Find("Receiver").SendMessage("ShowLastMessage");
+                }
+                
             }
         }
     }
